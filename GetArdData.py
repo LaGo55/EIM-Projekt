@@ -1,42 +1,78 @@
-#import serial
-import numpy
+import serial
 import matplotlib.pyplot as plt
-from drawnow import *
-
-import numpy as np
+from matplotlib.animation import FuncAnimation
+from itertools import count
+import time
 import pandas as pd
 import datetime as dt
+from time import sleep
 
-df[0] = ['Time']
-df[1] = ['Sensor Data']
-print(df)
 
-# while True:
-#
-#         df['randNumCol1'] = pd.DataFrame(np.random.uniform(-1, 1, df.shape[0]))
-#         df['randNumCol2'] = pd.DataFrame(np.random.normal(-1, 1, df.shape[1]))
-#         df['datetime'] = pd.Series([dt.datetime.now()])
-#
-#
-#
-#
-# def GetSensorData():
-#
-#     while True: #While Schleife, die immer durchläuft
-#         while (arduinoData.inWaiting()==0):
-#             pass #Mache nichts, wenn keine Daten da sind
-#         df['Sensor Data'] = arduinoData.readline() #Lese Zeile aus dem Arduino Serial port
-#         print(arduinoString)
-#         dataArray = arduinoString #Wenn Data mit , getrennt wird --> Add: .split(",")
-#         frequency = float(dataArray[0])
-#         #t = float(dataArray[1])
-#         #temperature = float(dataArray[1])   #Wenn mehr Daten eingelesen werden
-#         #print frequency #, "," temperature
-#         freq.append(frequency)
-#         zeit.append(t)
-#         drawnow(makeFig) #Update live Grafik
-#         plt.pyplot.pause(.000001)
-#         cnt = cnt+1
-#         if(cnt>50):
-#             freq.pop(0)
-#             zeit.pop(0)'
+plt.style.use("fivethirtyeight")
+counter = 0
+index = count()
+
+ax = plt.gca()
+x_values = []
+y_values = []
+
+
+
+i = 1
+graph = pd.DataFrame(columns=('Time','Data'))
+df = pd.DataFrame(columns=('Time','Data'))
+df1 = pd.DataFrame()
+
+ArduinoData = serial.Serial("com6", 9600)
+
+while True: #While Schleife, die immer durchläuf
+    def animate(k):
+
+        y = df['Data'].iloc[-1]
+        y_values.append(y)
+        x = df['Time'].iloc[-1]
+        x_values.append(x)
+        counter = next(index)
+
+        if counter > 40:
+            '''
+            This helps in keeping the graph fresh and refreshes values after every 40 timesteps
+            '''
+            x_values.pop(0)
+            y_values.pop(0)
+            # counter = 0
+            plt.cla()  # clears the values of the graph
+
+        plt.plot(x_values, y_values, linestyle='--')
+
+        ax.legend(["Frequency"])
+        ax.set_xlabel("Time")
+        ax.set_ylabel("Live Sensor Data")
+        plt.title('Live Sensor Data')
+        time.sleep(.25)  # keep refresh rate of 0.25 seconds
+
+    while (ArduinoData.inWaiting()==0):
+        pass #Mache nichts, wenn keine Daten da sind
+    while i <= 100:
+        arduinoPacket = ArduinoData.readline()
+        arduinoString = str(arduinoPacket, 'utf-8')
+        arduinoString = arduinoString.strip('\r\n')
+        frequency = float(arduinoString)
+        TM = dt.datetime.now()
+        df1['Time'] = pd.DataFrame([TM])
+        df1['Data'] = pd.DataFrame([frequency])
+
+        df['Time'] = pd.to_datetime(df['Time'], format="%Y-%d-%m %H:%M:%S")
+        df = pd.concat([df,df1], ignore_index=True)
+        ani = FuncAnimation(plt.gcf(), animate, 1)
+        plt.tight_layout()
+        plt.show()
+        i = i+1
+    print(df)
+
+
+
+
+
+
+

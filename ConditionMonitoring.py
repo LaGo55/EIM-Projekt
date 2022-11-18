@@ -2,7 +2,7 @@ import serial
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from itertools import count
-import time
+import numpy as np
 import pandas as pd
 import datetime as dt
 from time import sleep
@@ -11,19 +11,29 @@ from time import sleep
 plt.style.use("fivethirtyeight")
 counter = 0
 index = count()
-csv = pd.DataFrame()
-x_values = []
-y_values = []
+csv = 'data.csv'
+
+
 
 def monitoring(csv):
-    with open("data.csv", "r") as ll:
+    Date = np.array([0])
+    ySen1 = np.array([0])
+    ySen2 = np.array([0])
+
+    with open(csv, "r") as ll:
         last_line = ll.readlines()[-1]
-    csv = csv.append(last_line, ignore_index=True)
 
-    if len(csv)>50:
-        csv = csv.drop()[-1]
+    dataString = last_line.split(",")
+    Date = Date.np.append(dataString[0])
+    ySen1 = ySen1.append(dataString[1])
+    ySen2 = ySen2.append(dataString[2])
 
-    return csv
+    if Date.size()>50:
+        Date = Date.drop()[0]
+        ySen1 = ySen1.drop()[0]
+        ySen2 = ySen2.drop()[0]
+
+    return Date,ySen1,ySen2
 
 
 
@@ -40,10 +50,8 @@ def animate(k):
     # ax.set_ylabel("Live Sensor Data")
     plt.title('Live Sensor Data')
 
-#while True:
 
-    #monitoring(csv)
-
+#print(monitoring(csv))
 
 ani = FuncAnimation(plt.gcf(), animate, interval=500)
 plt.tight_layout()

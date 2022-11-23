@@ -5,7 +5,7 @@ from itertools import count
 import numpy as np
 import pandas as pd
 import datetime as dt
-from time import sleep
+
 
 
 plt.style.use("fivethirtyeight")

@@ -1,23 +1,30 @@
-import pandas as pd
 
-csv = 'csv.csv'
+from collections import deque
 
-def ConditionMonitoring(csv):
+def ConditionMonitoring(t,x1,x2):
 
-    colnames = ['time','freq','temp']
-    df = pd.read_csv(csv,sep=';',names=colnames)
+    max_length = 50
+    Date = deque(maxlen=max_length)
+    freq = deque(maxlen=max_length)
+    temp = deque(maxlen=max_length)
 
-    time = df['time'].tolist()
-    freq = df['freq'].tolist()
-    temp = df['temp'].tolist()
+    Date.append(t)
+    freq.append(x1)
+    temp.append(x2)
 
     if 80 < max(freq) < 100:
         output_freq = print("Die Amplitude der Frequenz nimmt zu (Gelb)")
-    elif max(freq) >= 100:
+        color = "yellow"
+    elif 100 >= max(freq) < 105:
         output_freq = print("Die Amplitude der Frequenz ist zu groß (Rot)")
+        color = "red"
+    elif max(freq) >=120:
+        output_freq = print("Kritischer System Zustand!")
+        return (output_freq)
+        color = "red"
     else:
-        output_freq = print("Die Amplitude der Freuqenz ist in Ordnung (Grün)")
-
+        output_freq = print("Die Amplitude der Frequenz ist in Ordnung (Grün)")
+        color = "green"
     if 20 < max(temp) < 23:
         output_temp = print("Die Temperatur nimmt zu (Gelb)")
     elif max(temp) >= 23:
@@ -25,6 +32,4 @@ def ConditionMonitoring(csv):
     else:
         output_temp = print("Die Temperatur ist in Ordnung (Grün)")
 
-    return(output_freq,output_temp)
-
-ConditionMonitoring(csv)
+    return(output_freq,output_temp,color)

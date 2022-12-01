@@ -1,7 +1,7 @@
 import time
 
 def getArdData(x):
-    time.sleep(.01)
+    time.sleep(.05)
     arduinoPacket = x.readline()
     arduinoString = str(arduinoPacket, 'utf-8')
     arduinoString = arduinoString.strip('\r\n')

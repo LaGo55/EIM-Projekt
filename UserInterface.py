@@ -2,7 +2,6 @@
 # Standard Funktionen
 import pandas as pd
 import datetime as dt
-from collections import deque
 import serial
 
 # Dash / GUI Funktionen
@@ -12,11 +11,6 @@ import plotly.graph_objs as go
 from dash.dependencies import Input, Output
 import dash_daq as daq
 import dash_bootstrap_components as dbc
-
-# Eigene Funktionen
-import functionConditionMonitoring as fCM
-import getArdData as gAD
-import DataToCSV as DB
 
 app = dash.Dash(__name__)
 
@@ -49,17 +43,6 @@ ind1 = [html.Div(id='traffic', children=[
         html.Div(dcc.Interval(id='update-status',
                             interval=50, # 1s
                             n_intervals=0))]
-                    # daq.Indicator(id='traffic-light',
-                    #         color=statuscolor,
-                    #         value=False,
-                    #         label='Zustand',
-                    #         width=125,
-                    #         style={'horizontal-align':'middle','vertical-align':'middle','display':'inline-block','float':'middle','text-align':'center'}
-                    #        ),
-                    # dcc.Interval(id='update-status',
-                    #         interval=1000, # 1s
-                    #         n_intervals=0)
-
 
 table1 = html.Div(className='Table-Content', children=[ html.H3('Daten Tabelle'),
     dash_table.DataTable(id='Data-Overview',

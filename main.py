@@ -1,4 +1,5 @@
 def main():
+
     import datetime as dt
     import serial
     from collections import deque
@@ -9,12 +10,12 @@ def main():
     import UserInterface
     import history as hist
 
-    i = 0
     com = "com6"  # Arduino Port
     ArduinoData = serial.Serial(com, 9600)  # Arduino Port und Bau-Rate
 
     DB # Initialisiere Database
-    UserInterface
+    hist # Initialisiere History
+    UserInterface # Initialisiere Database
 
     color_list = deque(maxlen=10) # Initialisierte Liste für die Historie
     color_list.append('green')
@@ -45,7 +46,7 @@ def main():
                 hist.write_history(x_value, sens1, out1)
             else:
                 pass
-        except ValueError or IndexError:
+        except ValueError or IndexError or TypeError:
             pass
 if __name__ == '__main__':
     main()

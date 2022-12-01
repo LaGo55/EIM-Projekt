@@ -13,6 +13,10 @@ from multiprocessing import Process
 
 DB # Initialisiere Database
 
+color_list = deque(maxlen=10) # Initialisierte Liste für die Historie
+color_list.append('green')
+color_list.append('green')
+
 i = 0
 com = "com6"
 ArduinoData = serial.Serial(com, 9600)
@@ -32,6 +36,21 @@ while True:
     df, i = DCDf.DataFrame(x_value, sens1, sens2, i)
     DB.CreateDataBase(x_value,sens1,sens2)
     out1, out2, color = fCM.ConditionMonitoring(x_value, sens1, sens2)  # t,y1,y2
+    color_list.append(color)
 
+    if color_list[-1] == 'green' and color_list[-2] == 'green':
+        pass
+    elif color_list[-1] == 'green' and color_list[-2] != 'green':
+        hist.write_history(x_value, out1, out2)
+    elif color_list[-1] == 'yellow' and color_list[-2] == 'yellow':
+        pass
+    elif color_list[-1] == 'yellow' and color_list[-2] != 'yellow':
+        hist.write_history(x_value, out1, out2)
+    elif color_list[-1] == 'red' and color_list[-2] == 'red':
+        pass
+    elif color_list[-1] == 'red' and color_list[-2] != 'red':
+        hist.write_history(x_value, out1, out2)
+    else:
+        pass
 
 

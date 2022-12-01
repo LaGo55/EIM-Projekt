@@ -1,8 +1,7 @@
-
 from collections import deque
 
-def ConditionMonitoring(t,x1):
 
+def ConditionMonitoring(t, x1):
     max_length = 50
     Date = deque(maxlen=max_length)
     freq = deque(maxlen=max_length)
@@ -10,18 +9,17 @@ def ConditionMonitoring(t,x1):
     Date.append(t)
     freq.append(x1)
 
-
     if 80 < max(freq) < 100:
-        output_freq = print("Warnung (Gelb)")
+        output_freq = "Warnung (Gelb)"
         color = "yellow"
     elif 100 >= max(freq) < 105:
-        output_freq = print("Kritischer Zustand (Rot)")
+        output_freq = "Kritischer Zustand (Rot)"
         color = "red"
-    elif max(freq) >=120:
-        output_freq = print("Kritischer System Zustand!")
+    elif max(freq) >= 120:
+        output_freq = "Möglicher Systemausfall (Rot)"
         color = "red"
     else:
-        output_freq = print("OK (Grün)")
+        output_freq = "In Ordnung (Grün)"
         color = "green"
 
-    return(output_freq,color)
+    return output_freq, color

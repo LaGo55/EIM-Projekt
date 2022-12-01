@@ -7,6 +7,7 @@ def main():
     import DataToCSV as DB
     import functionConditionMonitoring as fCM
     import UserInterface
+    import history as hist
 
     i = 0
     com = "com6"  # Arduino Port
@@ -26,28 +27,26 @@ def main():
                 pass
             x_value = dt.datetime.now()
             sens1,sens2 = gAD.getArdData(ArduinoData)
-           # df, i = DCDf.DataFrame(x_value, sens1, sens2, i)
             DB.CreateDataBase(x_value,sens1,sens2)
-            out1, out2, statuscolor = fCM.ConditionMonitoring(x_value, sens1, sens2)
+            out1, color = fCM.ConditionMonitoring(x_value, sens1)
+            color_list.append(color)
+
+            if color_list[-1] == 'green' and color_list[-2] == 'green':
+                pass
+            elif color_list[-1] == 'green' and color_list[-2] != 'green':
+                hist.write_history(x_value, sens1, out1)
+            elif color_list[-1] == 'yellow' and color_list[-2] == 'yellow':
+                pass
+            elif color_list[-1] == 'yellow' and color_list[-2] != 'yellow':
+                hist.write_history(x_value, sens1, out1)
+            elif color_list[-1] == 'red' and color_list[-2] == 'red':
+                pass
+            elif color_list[-1] == 'red' and color_list[-2] != 'red':
+                hist.write_history(x_value, sens1, out1)
+            else:
+                pass
         except ValueError or IndexError:
             pass
-    color_list.append(color)
-
-    if color_list[-1] == 'green' and color_list[-2] == 'green':
-        pass
-    elif color_list[-1] == 'green' and color_list[-2] != 'green':
-        hist.write_history(x_value, out1)
-    elif color_list[-1] == 'yellow' and color_list[-2] == 'yellow':
-        pass
-    elif color_list[-1] == 'yellow' and color_list[-2] != 'yellow':
-        hist.write_history(x_value, out1)
-    elif color_list[-1] == 'red' and color_list[-2] == 'red':
-        pass
-    elif color_list[-1] == 'red' and color_list[-2] != 'red':
-        hist.write_history(x_value, out1)
-    else:
-        pass
-
 if __name__ == '__main__':
     main()
 

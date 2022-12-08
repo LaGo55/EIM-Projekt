@@ -12,7 +12,7 @@ from dash.dependencies import Input, Output
 import dash_daq as daq
 import dash_bootstrap_components as dbc
 
-app = dash.Dash(__name__)
+app = dash.Dash(__name__, suppress_callback_exceptions=True, external_stylesheets=[dbc.themes.SLATE])
 
 colors = {
     'background': '#708090',
@@ -20,31 +20,40 @@ colors = {
 }
 
 df = pd.read_csv('data.csv').tail(25)
+df1 = pd.read_csv('history.csv').tail(50)
 statuscolor = '#7CFC00'
 
 ## Definition der HTML Content Elemente für das Layout
 
-tab1 = html.Div(className='Tab1')
-
-tab2 = html.Div(className='Diagram-Status',style={
-            'textAlign': 'left',
+tab2 = html.Div(id='Diagram-Status',style={
+            'width':'1200px',
+            'text-align': 'center',
             'horizontal-align':'middle',
-            'color': colors['text']},
-            children=[dcc.Graph(id='live-graph',
-                        style={'margin-left': '50px',
-                        'top': '50px',
-                        'display':'inline-block'})])
+            'color': colors['text'],
+            'display':'inline-block'},
+            children=[
+                dbc.Col(
+                dbc.Card(dbc.CardBody([dcc.Graph(id='live-graph',
+                        style={
+                        'display':'inline-block'})]))
+                    )])
 
-ind1 = [html.Div(id='traffic', children=[
+ind1 = [html.Div(id='traffic', style={'display':'inline-block'}, children=
+    dbc.Col(
+    dbc.Card(
+        dbc.CardBody([
                     html.Div(id='status-image', children=[html.Div(style = {'background-image': 'url("/static/ok.jpg")',
                           'background-repeat': 'no-repeat',
                           'background-size': 'auto'
-                          })])]),
-        html.Div(dcc.Interval(id='update-status',
+                          })]),
+                    html.Div(dcc.Interval(id='update-status',
                             interval=50, # 1s
                             n_intervals=0))]
+        ))
+))]
 
-table1 = html.Div(className='Table-Content', children=[ html.H3('Daten Tabelle'),
+table1 = html.Div(id='Table-Content', children=[
+    html.H3('Daten Tabelle',style={'text-align':'center'}),
     dash_table.DataTable(id='Data-Overview',
 
         data=df.to_dict('records'),
@@ -52,7 +61,8 @@ table1 = html.Div(className='Table-Content', children=[ html.H3('Daten Tabelle')
         style_table={'width':'90%',
                'margin-left':'10',
                'margin-right':'10',
-               'top':'50'
+               'top':'50',
+               'component-align':'center'
         },
         style_header={
             'backgroundColor': 'rgb(30, 30, 30)',
@@ -67,24 +77,73 @@ table1 = html.Div(className='Table-Content', children=[ html.H3('Daten Tabelle')
         )
     ])
 
+table2 = html.Div(id='Table-Content2', children=[
+    html.H3('Fehler-Historie', style={'text-align':'center'}),
+    dash_table.DataTable(id='Data-Overview1',
 
-app.layout = html.Div(className='content', style={'backgroundColor': colors['background']},children=[
-    html.H1('Live Data Feed',
-            style={'float':'middle'}),
-
-    dbc.Row(className='Row',style={'width':'100%'},children=[
-        dbc.Col(tab1,style={'width':'20px'}),
-        dbc.Col(tab2,style={'width':'600px'}),
-        dbc.Col(ind1,style={'margin-left':'50px','margin-bottom':'60px'})]),
-    dbc.Row(table1, style={'width':'100%'}),
-    dcc.Interval(
-        id='interval-component',
-        interval=1000, # 1s
-        n_intervals=0)
-
+        data=df1.to_dict('records1'),
+        columns=[{'id': c, 'name': c} for c in df1.columns],
+        style_table={'width':'90%',
+               'margin-left':'10',
+               'margin-right':'10',
+               'top':'50',
+               'component-align':'center'
+        },
+        style_header={
+            'backgroundColor': 'rgb(30, 30, 30)',
+            'color': 'white'
+        },
+        style_data={
+            'width': '20%',
+            'backgroundColor': 'rgb(50, 50, 50)',
+            'color': 'white'},
+        style_cell={'height':'auto',
+                    'textAlign': 'left'},
+        )
     ])
 
+content1= html.Div([
+    dbc.Card(dbc.CardBody([dbc.Row(html.H1('Live Data Feed',style={'text-align':'center'}),align='center'),
+            dbc.Row([
+                dbc.Col(tab2,width=8),
+                dbc.Col(width=1),
+                dbc.Col(ind1,width=2)],
+            align='center')]))
+            ])
+content2 = html.Div([
+            dbc.Card(dbc.CardBody([
+                dbc.Row(html.H1('Fehler Historie',style={'text-align':'center'}),align='center'),
+                dbc.Row(table2, style={'margin-left':'50','component-align':'center'}),
+                dbc.Row(table1, style={'margin-left':'50','component-align':'center'})]))])
+
+
+app.layout = html.Div(
+    html.Div(id='content1', style={'backgroundColor': colors['background']},
+            children=[dbc.Card(
+                dbc.CardBody(children=[
+            dbc.Row(dcc.Tabs(id='tab-selection',value='Diagram Status',children=[
+                    dcc.Tab(label='Live Diagramm', value='Diagram Status'),
+                    dcc.Tab(label='Fehler-Historie',value='Table-Content')
+                    ])),
+            dbc.Row(html.Div(id='tabs-content')),
+            dcc.Interval(
+                id='interval-component',
+                interval=1000,  # 1s
+                n_intervals=0)]
+            ))
+            ]
+             )
+)
+
 ## Callbacks für das interaktive Updaten der HTML Elemente
+@app.callback(
+    Output('tabs-content','children'),
+    Input('tab-selection','value'))
+def tabcontent(tab):
+    if tab=='Diagram Status':
+        return html.Div([content1])
+    elif tab=='Table-Content':
+        return html.Div([content2])
 
 #Callback für den Live-Graph
 @app.callback(
@@ -112,8 +171,11 @@ def graph_update(n):
             size=18,
             color="Black"
         ),
-        margin={'l':50,'r':1,'t':45,'b':1}
-    )
+        margin={'l':80,'r':50,'t':45,'b':1},
+        width=1000,
+        plot_bgcolor='#888888',
+        transition_easing='sin-in-out'
+        )
 
     # Hinzufügen der Mittellinie und oberen/unteren Grenzen
     fig.add_hline(y=100, line_color='Green')
@@ -124,14 +186,19 @@ def graph_update(n):
 # Callback zum interaktiven Updaten der Tabelle mit der Daten-Übersicht
 @app.callback(
     Output('Data-Overview','data'),
+    Output('Data-Overview1','data1'),
     Input('interval-component','n_intervals')) #Update nach dem im Layout definierten 'Interval'
 def table_update(n):
     df = pd.read_csv('data.csv').tail(25)   #Einlesen der letzen 25 Werte der data.csv Datei
-    data=df.to_dict('records')              #Umwandeln des Dataframes in ein Dictionary
-    return data                             #Übergabe an Layout Element
+    data=df.to_dict('records')               #Umwandeln des Dataframes in ein Dictionary
+
+    df1 = pd.read_csv('history.csv').tail(50) # Einlesen der letzen 50 Werte der data.csv Datei
+    data1 = df1.to_dict('records1')  # Umwandeln des Dataframes in ein Dictionary
+
+    return [data,data1]                             #Übergabe an Layout Element
 
 @app.callback(
-    Output('status-image','children'),
+    Output('traffic','children'),
     Input('update-status','n_intervals'))
 def update_status(n):
     dfs = pd.read_csv('data.csv', names = ['Time', 'Data_1','Data_2'], skiprows=1).tail(1)

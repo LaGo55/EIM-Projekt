@@ -49,5 +49,7 @@ def main():
         except ValueError or IndexError or TypeError:
             pass
 if __name__ == '__main__':
-    main()
-
+    try:
+        main()
+    except ValueError or IndexError or TypeError:
+        pass

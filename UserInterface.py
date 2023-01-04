@@ -22,7 +22,7 @@ colors = {
 
 #Erstellen der Dataframes für die Tabellen "Daten-Übersicht" und "Fehler-Historie"
 df = pd.read_csv('data.csv').tail(25)
-df1 = pd.read_csv('history.csv').tail(50)
+df1 = pd.read_csv('history.csv').tail(25)
 
 ## Definition der HTML Content Elemente für das Layout
 
@@ -50,7 +50,7 @@ ind1 = [html.Div(id='traffic', style={'display':'inline-block'}, children=
                           'background-size': 'auto'
                           })]),
                     html.Div(dcc.Interval(id='update-status',   #Interval zum Abfragen des Status
-                            interval=50, # 1s
+                            interval=200, # 200ms
                             n_intervals=0))]
         ))
 ))]
@@ -89,7 +89,7 @@ table2 = html.Div(id='Table-Content2', children=[
     html.H3('Fehler-Historie', style={'text-align':'center'}),
     dash_table.DataTable(id='Data-Overview1',
         #Übergabe des Dataframes an die Table-Daten
-        data=df1.to_dict('records1'),
+        data=df1.to_dict('records'),
         #Auslesen und bestimmen der Spalten Titel
         columns=[{'id': c, 'name': c} for c in df1.columns],
         #Styling der Tabelle
@@ -150,7 +150,7 @@ app.layout = html.Div(
             #Interval für Update-Geschw.
             dcc.Interval(
                 id='interval-component',
-                interval=1000,  # 1s
+                interval=50,  # 1s
                 n_intervals=0)]
             ))
             ]
@@ -172,7 +172,7 @@ def tabcontent(tab):
     Output('live-graph','figure'),
     Input('interval-component','n_intervals'))  #Update nach dem im Layout definierten 'Interval'
 def graph_update(n):
-    v = 30 #Variable für die Anzahl der anzuzeigenden Datenelemente
+    v = 100 #Variable für die Anzahl der anzuzeigenden Datenelemente
     #Defintion des Dataframes aus der data.csv Datei
     header = ['Time', 'Data_1','Data_2']
     df = pd.read_csv('data.csv',names=header, skiprows=1)
@@ -193,8 +193,8 @@ def graph_update(n):
             size=18,
             color="Black"
         ),
-        margin={'l':80,'r':50,'t':45,'b':1},
-        autosize=False,
+        margin={'l':50,'r':50,'t':45,'b':50},
+        autosize=True,
         plot_bgcolor='#888888',
         transition_easing='sin-in-out'
         )
@@ -208,16 +208,22 @@ def graph_update(n):
 # Callback zum interaktiven Updaten der Tabelle mit der Daten-Übersicht
 @app.callback(
     Output('Data-Overview','data'),
-    Output('Data-Overview1','data1'),
     Input('interval-component','n_intervals')) #Update nach dem im Layout definierten 'Interval'
 def table_update(n):
     df = pd.read_csv('data.csv').tail(25)   #Einlesen der letzen 25 Werte der data.csv Datei
     data=df.to_dict('records')               #Umwandeln des Dataframes in ein Dictionary
 
-    df1 = pd.read_csv('history.csv').tail(50) # Einlesen der letzen 50 Werte der data.csv Datei
-    data1 = df1.to_dict('records1')  # Umwandeln des Dataframes in ein Dictionary
+    return data                             #Übergabe an Layout Element
 
-    return [data,data1]                             #Übergabe an Layout Element
+# Callback zum interaktiven Updaten der Tabelle mit der Daten-Übersicht
+@app.callback(
+    Output('Data-Overview1','data'),
+    Input('interval-component','n_intervals')) #Update nach dem im Layout definierten 'Interval'
+def table_update1(n):
+
+    df1 = pd.read_csv('history.csv').tail(50) # Einlesen der letzen 50 Werte der data.csv Datei
+    data1 = df1.to_dict('records')  # Umwandeln des Dataframes in ein Dictionary
+    return data1                            #Übergabe an Layout Element
 
 #Callback für das Update der Status Anzeige
 @app.callback(

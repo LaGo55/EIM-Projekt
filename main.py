@@ -5,30 +5,27 @@ def main():
     from collections import deque
 
     import getArdData as gAD
-    import DataToCSV as DB
+    import DataToCSV as Db
     import functionConditionMonitoring as fCM
-    import UserInterface
     import history as hist
 
     com = "com6"  # Arduino Port
     ArduinoData = serial.Serial(com, 9600)  # Arduino Port und Bau-Rate
 
-    DB # Initialisiere Database
-    hist # Initialisiere History
-    UserInterface # Initialisiere Database
+    Db.init_DB()            # Initialisiere Database
+    hist.init_history()     # Initialisiere History
 
-    color_list = deque(maxlen=10) # Initialisierte Liste für die Historie
+    color_list = deque(maxlen=10)   # Initialisierte Liste für die Historie
     color_list.append('green')
     color_list.append('green')
-
 
     while True:
         try:
             while (ArduinoData.inWaiting() == 0):
                 pass
             x_value = dt.datetime.now()
-            sens1,sens2 = gAD.getArdData(ArduinoData)
-            DB.CreateDataBase(x_value,sens1,sens2)
+            sens1, sens2 = gAD.getArdData(ArduinoData)
+            Db.CreateDataBase(x_value, sens1, sens2)
             out1, color = fCM.ConditionMonitoring(x_value, sens1)
             color_list.append(color)
 
@@ -48,8 +45,10 @@ def main():
                 pass
         except ValueError or IndexError or TypeError:
             pass
+
 if __name__ == '__main__':
     try:
         main()
     except ValueError or IndexError or TypeError:
+        print("Error")
         pass

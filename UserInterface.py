@@ -183,7 +183,7 @@ def tabcontent(tab):
 @app.callback(
     Output('live-graph', 'figure'),
     Input('interval-component', 'n_intervals'))  # Update nach dem im Layout definierten 'Interval'
-def graph_update():
+def graph_update(n):
     v = 100  # Variable für die Anzahl der anzuzeigenden Datenelemente
     # Defintion des Dataframes aus der data.csv Datei
     header = ['Time', 'Data_1', 'Data_2']
@@ -223,7 +223,7 @@ def graph_update():
 @app.callback(
     Output('Data-Overview', 'data'),
     Input('interval-component', 'n_intervals'))     # Update nach dem im Layout definierten 'Interval'
-def table_update():
+def table_update(n):
     df = pd.read_csv('data.csv').tail(25)           # Einlesen der letzen 25 Werte der data.csv Datei
     data = df.to_dict('records')                    # Umwandeln des Dataframes in ein Dictionary
     return data                                     # Übergabe an Layout Element
@@ -233,7 +233,7 @@ def table_update():
 @app.callback(
     Output('Data-Overview1', 'data'),
     Input('interval-component', 'n_intervals'))  # Update nach dem im Layout definierten 'Interval'
-def table_update1():
+def table_update1(n):
     df1 = pd.read_csv('history.csv').tail(50)   # Einlesen der letzen 50 Werte der data.csv Datei
     data1 = df1.to_dict('records')              # Umwandeln des Dataframes in ein Dictionary
     return data1                                # Übergabe an Layout Element
@@ -244,7 +244,7 @@ def table_update1():
     Output('traffic', 'children'),
     Input('update-status', 'n_intervals'))
 # Funktion, die das letzte gesendete Element ausliest und auswertet
-def update_status():
+def update_status(n):
     dfs = pd.read_csv('data.csv', names=['Time', 'Data_1', 'Data_2'], skiprows=1).tail(1)
     freq = dfs['Data_1'].tail(1).iloc[0].astype(float)
     if 120 <= freq or freq <= 80:  # Grenzen für kritische Werte

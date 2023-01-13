@@ -7,6 +7,11 @@ String message;
 LIS331 xl;
 //AT+BAUD8;
 
+const int RunningAverageCount = 100;
+float RunningAverageBufferZ[RunningAverageCount];
+float RunningAverageBufferY[RunningAverageCount];
+int NextRunningAverage;
+
 void setup() 
 {
   Serial.begin(9600);
@@ -32,16 +37,40 @@ void loop()
     xl.setHighPassCoeff(LIS331::HPC_64);
     xl.enableHPF(true);
     
-    float x_g = xl.convertToG(100,x);
+    float y_g = xl.convertToG(100,y);
     float z_g = xl.convertToG(100,z);
+
+    // Averaging the raw acceleration data before printing out
+
+    float RawAccelerationZ = z_g;
+    float RawAccelerationY = y_g;
+    RunningAverageBufferZ[NextRunningAverage++] = RawAccelerationZ;
+    RunningAverageBufferY[NextRunningAverage++] = RawAccelerationY;
+
+    if (NextRunningAverage >= RunningAverageCount)
+    {
+      NextRunningAverage = 0; 
+    }
+    float RunningAverageAccelerationZ = 0;
+    float RunningAverageAccelerationY = 0;
+    for(int i=0; i < RunningAverageCount; ++i)
+    {
+     RunningAverageAccelerationZ += RunningAverageBufferZ[i];
+     RunningAverageAccelerationY += RunningAverageBufferY[i];
+    }
+    RunningAverageAccelerationZ /= RunningAverageCount;
+    RunningAverageAccelerationY /= RunningAverageCount;
+ 
+    
     //Serial.println(x);
     //Serial.println(y);
     //Serial.println(z);
     //Serial.println(xl.convertToG(100,x)); // The convertToG() function
     //Serial.println(xl.convertToG(100,y)); // accepts as parameters the
-    Serial1.print(z_g);// raw value and the current
+    //Serial1.print(z_g);// raw value and the current
+    Serial1.print(RunningAverageAccelerationZ);
     Serial1.print(",");
-    Serial1.println(x_g);
+    Serial1.println(RunningAverageAccelerationY);
     // Serial.println(" ");  // maximum g-rating. 
 
 }

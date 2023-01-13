@@ -10,6 +10,7 @@ from dash import dcc, html, dash_table
 import plotly.graph_objs as go
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
+import main
 
 # Initialisieren der Web-App
 app = dash.Dash(__name__, suppress_callback_exceptions=True, external_stylesheets=[dbc.themes.SLATE])
@@ -195,7 +196,7 @@ def graph_update(n):
     # Erstellen der Figure mit dash_graphic_objects
     fig = go.Figure(
         data={'x': time, 'y': freq},
-        layout_yaxis_range=[70, 130])  # Übergabe der X-/Y-Werte und Festlegen der Y-Achse
+        layout_yaxis_range=[-2, 5])  # Übergabe der X-/Y-Werte und Festlegen der Y-Achse
     fig.update_layout(  # Formatierungen des Diagramms
         title='Riemen Status',
         xaxis_title="Zeit",
@@ -213,9 +214,9 @@ def graph_update(n):
         )
 
     # Hinzufügen der Mittellinie und oberen/unteren Grenzen
-    fig.add_hline(y=100, line_color='Green')
-    fig.add_hline(y=80, line_dash='dash', line_color='red')
-    fig.add_hline(y=120, line_dash='dash', line_color='red')
+    fig.add_hline(y=3, line_color='Green')
+    fig.add_hline(y=0, line_dash='dash', line_color='red')
+    fig.add_hline(y=4, line_dash='dash', line_color='red')
     return fig
 
 
@@ -247,9 +248,9 @@ def table_update1(n):
 def update_status(n):
     dfs = pd.read_csv('data.csv', names=['Time', 'Data_1', 'Data_2'], skiprows=1).tail(1)
     freq = dfs['Data_1'].tail(1).iloc[0].astype(float)
-    if 120 <= freq or freq <= 80:  # Grenzen für kritische Werte
+    if 4 <= freq or freq <= 0:  # Grenzen für kritische Werte
         return [html.Img(src=r'assets/kritisch.jpg', alt='image')]
-    elif 110 <= freq or freq <= 90:   # Grenzen für Warnung
+    elif 3.5 <= freq or freq <= 0.5:   # Grenzen für Warnung
         return [html.Img(src=r'assets/vorsicht.jpg', alt='image')]
     else:   # Wenn keine Grenzen errreicht werden --> OK
         return [html.Img(src=r'assets/ok.jpg', alt='image')]

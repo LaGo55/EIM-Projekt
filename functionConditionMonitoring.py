@@ -9,14 +9,11 @@ def ConditionMonitoring(t, x1):
     Date.append(t)
     freq.append(x1)
 
-    if 80 < max(freq) < 100:
+    if 3.5 > max(freq) < 4 and 0 > max(freq) < 1:
         output_freq = "Warnung (Gelb)"
         color = "yellow"
-    elif 100 >= max(freq) < 105:
+    elif 4 >= max(freq) and 0 <= max(freq):
         output_freq = "Kritischer Zustand (Rot)"
-        color = "red"
-    elif max(freq) >= 120:
-        output_freq = "Möglicher Systemausfall (Rot)"
         color = "red"
     else:
         output_freq = "In Ordnung (Grün)"

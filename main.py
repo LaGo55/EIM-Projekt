@@ -9,7 +9,7 @@ def main():
     import functionConditionMonitoring as fCM
     import history as hist
 
-    com = "com6"  # Arduino Port
+    com = "com7"  # Arduino Port
     ArduinoData = serial.Serial(com, 9600)  # Arduino Port und Bau-Rate
 
     Db.init_DB()            # Initialisiere Database

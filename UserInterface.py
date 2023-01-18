@@ -196,7 +196,7 @@ def graph_update(n):
     # Erstellen der Figure mit dash_graphic_objects
     fig = go.Figure(
         data={'x': time, 'y': freq},
-        layout_yaxis_range=[-2, 5])  # Übergabe der X-/Y-Werte und Festlegen der Y-Achse
+        layout_yaxis_range=[0.75, 2.25])  # Übergabe der X-/Y-Werte und Festlegen der Y-Achse
     fig.update_layout(  # Formatierungen des Diagramms
         title='Riemen Status',
         xaxis_title="Zeit",
@@ -214,9 +214,11 @@ def graph_update(n):
         )
 
     # Hinzufügen der Mittellinie und oberen/unteren Grenzen
-    fig.add_hline(y=3, line_color='Green')
-    fig.add_hline(y=0, line_dash='dash', line_color='red')
-    fig.add_hline(y=4, line_dash='dash', line_color='red')
+    fig.add_hline(y=1.6, line_color='Green')
+    fig.add_hline(y=1, line_dash='dash', line_color='red')
+    fig.add_hline(y=2, line_dash='dash', line_color='red')
+    fig.add_hline(y=1.45, line_dash='dash', line_color='yellow')
+    fig.add_hline(y=1.75, line_dash='dash', line_color='yellow')
     return fig
 
 
@@ -248,9 +250,9 @@ def table_update1(n):
 def update_status(n):
     dfs = pd.read_csv('data.csv', names=['Time', 'Data_1', 'Data_2'], skiprows=1).tail(1)
     freq = dfs['Data_1'].tail(1).iloc[0].astype(float)
-    if 4 <= freq or freq <= 0:  # Grenzen für kritische Werte
+    if 2 <= freq or freq < 1:  # Grenzen für kritische Werte
         return [html.Img(src=r'assets/kritisch.jpg', alt='image')]
-    elif 3.5 <= freq or freq <= 0.5:   # Grenzen für Warnung
+    elif (2 > freq > 1.75) or 1.45 > freq <= 1:   # Grenzen für Warnung
         return [html.Img(src=r'assets/vorsicht.jpg', alt='image')]
     else:   # Wenn keine Grenzen errreicht werden --> OK
         return [html.Img(src=r'assets/ok.jpg', alt='image')]

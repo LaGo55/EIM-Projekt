@@ -1,6 +1,7 @@
 def main():
 
     import datetime as dt
+    import time
     import serial
     from collections import deque
 
@@ -24,6 +25,7 @@ def main():
             while (ArduinoData.inWaiting() == 0):
                 pass
             x_value = dt.datetime.now()
+            time.sleep(0.05)
             sens1, sens2 = gAD.getArdData(ArduinoData)
             Db.CreateDataBase(x_value, sens1, sens2)
             out1, color = fCM.ConditionMonitoring(x_value, sens1)

@@ -2,7 +2,7 @@ import time
 
 def getArdData(x):
     try:
-        time.sleep(.05)
+        #time.sleep(.05)
         arduinoPacket = x.readline()    # Lesen des Arduino Serial Outputs
         arduinoString = str(arduinoPacket, 'utf-8') # Umwandlung der Arduino Sprache in String
         arduinoString = arduinoString.strip('\r\n') # Entfernen von Umbrüchen
